@@ -1,4 +1,6 @@
 let particles = [];
+let vels;
+let accs;
 let TIME = 0;
 let Npos = 20;
 
@@ -78,7 +80,7 @@ function draw() {
   line(300, 0, 300, 600);
   line(0, 300, 600, 300);
 
-  let vels = [];
+  vels = [];
   for (let i = 0; i < particles.length - 1; i++) {
     vx =
       (particles[i + 1].x - particles[i].x) /
@@ -91,7 +93,7 @@ function draw() {
     append(vels, v);
   }
 
-  let accs = [];
+  accs = [];
   for (let i = 0; i < vels.length - 1; i++) {
     ax = (vels[i + 1].v.x - vels[i].v.x) / (vels[i + 1].t - vels[i].t);
     ay = (vels[i + 1].v.y - vels[i].v.y) / (vels[i + 1].t - vels[i].t);
