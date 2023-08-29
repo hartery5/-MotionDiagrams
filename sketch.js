@@ -27,6 +27,9 @@ let SP;
 function setup() {
   createCanvas(1200, 520);
   textSize(18);
+  textFont('Consolas');
+  textStyle('bold');
+  
 
   XTselect = createCheckbox("Show x-t");
   XTselect.style("font-family", "monospace");
@@ -191,6 +194,13 @@ function showXT() {
   textAlign(CENTER, CENTER);
   text("x (m)", 0, 0);
   pop();
+  
+  push();
+  translate(780, 150);
+  rotate(0);
+  textAlign(CENTER, CENTER);
+  text("t (s)", 0, 0);
+  pop();
 
   push();
   fill(0);
@@ -216,6 +226,14 @@ function showYT() {
   textAlign(CENTER, CENTER);
   text("y (m)", 0, 0);
   pop();
+  
+  push();
+  translate(1080, 150);
+  rotate(0);
+  textAlign(CENTER, CENTER);
+  text("t (s)", 0, 0);
+  pop();
+  
 
   push();
   fill(0);
@@ -243,6 +261,13 @@ function showVXT() {
   pop();
 
   push();
+  translate(780, 300);
+  rotate(0);
+  textAlign(CENTER, CENTER);
+  text("t (s)", 0, 0);
+  pop();
+  
+  push();
   fill(0);
   translate(650, 225);
   for (let i = 0; i < vels.length; i++) {
@@ -266,6 +291,13 @@ function showVYT() {
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
   text("vᵧ (m/s)", 0, 0);
+  pop();
+  
+  push();
+  translate(1080, 300);
+  rotate(0);
+  textAlign(CENTER, CENTER);
+  text("t (s)", 0, 0);
   pop();
 
   push();
@@ -293,6 +325,13 @@ function showAXT() {
   textAlign(CENTER, CENTER);
   text("aₓ (m/s²)", 0, 0);
   pop();
+  
+  push();
+  translate(780, 450);
+  rotate(0);
+  textAlign(CENTER, CENTER);
+  text("t (s)", 0, 0);
+  pop();
 
   push();
   fill(0);
@@ -318,6 +357,13 @@ function showAYT() {
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
   text("aᵧ (m/s²)", 0, 0);
+  pop();
+  
+  push();
+  translate(1080, 450);
+  rotate(0);
+  textAlign(CENTER, CENTER);
+  text("t (s)", 0, 0);
   pop();
 
   push();
