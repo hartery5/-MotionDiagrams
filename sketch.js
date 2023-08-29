@@ -239,7 +239,7 @@ function showVXT() {
   translate(610, 225);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("vx (m/s)", 0, 0);
+  text("vₓ (m/s)", 0, 0);
   pop();
 
   push();
@@ -265,7 +265,7 @@ function showVYT() {
   translate(910, 225);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("vy (m/s)", 0, 0);
+  text("vᵧ (m/s)", 0, 0);
   pop();
 
   push();
@@ -291,7 +291,7 @@ function showAXT() {
   translate(610, 375);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("ax (m/s²)", 0, 0);
+  text("aₓ (m/s²)", 0, 0);
   pop();
 
   push();
@@ -317,7 +317,7 @@ function showAYT() {
   translate(910, 375);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("ay (m/s²)", 0, 0);
+  text("aᵧ (m/s²)", 0, 0);
   pop();
 
   push();
