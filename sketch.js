@@ -263,7 +263,7 @@ function showXT() {
 
   fill(0);
   for (let i = 0; i < particles.length; i++) {
-    let px = (height/6-10)*(particles[i].x - width/4) / height;
+    let px = (height/3-10)*(particles[i].x - width/4) / height;
     let pt = particles[i].t * SP + 50;
     circle(pt, -px, 10);
   }
@@ -286,7 +286,7 @@ function showYT() {
 
   fill(0);
   for (let i = 0; i < particles.length; i++) {
-    let py = (height/6-10)*(particles[i].y - height/2) / height;
+    let py = (height/3-10)*(particles[i].y - height/2) / height;
     let pt = particles[i].t * SP + 50;
     circle(pt, py, 10);
   }
