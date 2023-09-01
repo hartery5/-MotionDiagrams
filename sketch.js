@@ -2,7 +2,7 @@ let particles = [];
 let vels;
 let accs;
 let TIME = 0;
-let Npos = 20;
+let Npos = 15;
 
 let XTselect;
 let YTselect;
@@ -19,13 +19,26 @@ let SHOWVYT;
 let SHOWAXT;
 let SHOWAYT;
 let SHOWCIRC;
+let SLIDER;
 
 let CLEAR;
+let SELECT;
+let MODE;
 
 let SP;
 
 function setup() {
-  createCanvas(1200, 520);
+  let w = floor(windowWidth/(3*Npos));
+  if ((w % 2)==0){
+    w+=2;
+  }
+  w *= 3*Npos;
+  let h = floor(windowHeight/(2*Npos));
+  if ((h % 2)==0){
+    h+=1;
+  }
+  h *= 2*Npos;
+  createCanvas(w, h);
   textSize(18);
   textFont('Consolas');
   textStyle('bold');
@@ -34,35 +47,51 @@ function setup() {
   XTselect = createCheckbox("Show x-t");
   XTselect.style("font-family", "monospace");
   XTselect.style("font-weight", "bold");
-  
+  XTselect.position(5,5);
+
   YTselect = createCheckbox("Show y-t");
   YTselect.style("font-family", "monospace");
   YTselect.style("font-weight", "bold");
+  YTselect.position(5,20);
   
   VXTselect = createCheckbox("Show vx-t");
   VXTselect.style("font-family", "monospace");
   VXTselect.style("font-weight", "bold");
+  VXTselect.position(100,5);
   
   VYTselect = createCheckbox("Show vy-t");
   VYTselect.style("font-family", "monospace");
   VYTselect.style("font-weight", "bold");
+  VYTselect.position(100,20);
   
   AXTselect = createCheckbox("Show ax-t");
   AXTselect.style("font-family", "monospace");
   AXTselect.style("font-weight", "bold");
+  AXTselect.position(195,5);
   
   AYTselect = createCheckbox("Show ay-t");
   AYTselect.style("font-family", "monospace");
   AYTselect.style("font-weight", "bold");
-  
-  CIRCselect = createCheckbox("Show Circular Motion");
-  CIRCselect.style("font-family", "monospace");
-  CIRCselect.style("font-weight", "bold");
+  AYTselect.position(195,20);
+
+  SELECT = createSelect();
+  SELECT.style("font-family", "monospace");
+  SELECT.style("font-weight", "bold");
+  SELECT.position(125,40);
+  SELECT.option("Freeform");
+  SELECT.option("Circular Motion");
+  SELECT.option("Projectile Motion");
+  SELECT.selected("Freeform")
   
   CLEAR = createButton('CLEAR POINTS');
   CLEAR.style("font-family", "monospace");
   CLEAR.style("font-weight", "bold");
   CLEAR.mousePressed(EMPTY);
+  CLEAR.position(5,40);
+
+  SLIDER = createSlider(0, 90, 45, 1);
+  SLIDER.position(125, 60);
+  SLIDER.style('width', '155px');
 }
 
 function draw() {
@@ -74,31 +103,68 @@ function draw() {
   SHOWVYT = VYTselect.checked();
   SHOWAXT = AXTselect.checked();
   SHOWAYT = AYTselect.checked();
-  SHOWCIRC = CIRCselect.checked();
-
+  MODE = SELECT.selected();
   push();
   stroke(150);
   setLineDash([5, 5]);
-  for (let i = Npos; i < 600; i += Npos) {
-    line(i, 0, i, height);
+  for (let i = Npos; i < width/2; i += Npos) {
+    line(i, 5*Npos, i, height);
   }
-  for (let i = Npos; i < height; i += Npos) {
-    line(0, i, 600, i);
+  for (let i = 5*Npos; i < height; i += Npos) {
+    line(0, i, width/2, i);
   }
   pop();
 
-  line(300, 0, 300, 600);
-  line(0, height/2, 600, height/2);
-  
-  if (SHOWCIRC){
+  push();
+  strokeWeight(2);
+  line(width/4, 5*Npos, width/4, height);
+  line(0, height/2, width/2, height/2);
+  pop();
+
+  if (MODE =='Freeform'){
+    SLIDER.hide();
+  } else {
+    SLIDER.show();
+  }
+
+  if (MODE=='Circular Motion'){
     TIME = 0
     particles = [];
+    let rad = SLIDER.value()
     for (let i=0; i<20; i++){
-      let px = 200*cos(2*PI*i/20)+300;
-      let py = -200*sin(2*PI*i/20)+height/2;
+      let px = 3*rad*cos(2*PI*i/20)+width/4;
+      let py = -3*rad*sin(2*PI*i/20)+height/2;
       let p = new particle(px,py,TIME);
       append(particles,p);
       TIME+=1;
+    }
+  }
+
+  if (MODE=='Projectile Motion'){
+    TIME = 0
+    particles = [];
+    let v = width/40;
+    let th = SLIDER.value()*PI/180;
+    let vx = v*cos(th);
+    let vy = -v*sin(th);
+    let a = Npos/8;
+    let Imax = round(2*abs(vy)/a);
+    let px = 0;
+    let py = 0;
+    let i = 0;
+    while (px<width/2){
+      px = vx*i;
+      py = height/2 + vy*i + a*pow(i,2);
+      if (px>width/2){
+        break
+      }
+      if (py>height){
+        break
+      }
+      let p = new particle(px,py,TIME);
+      append(particles,p);
+      TIME+=1;
+      i+=1;
     }
   }
 
@@ -133,7 +199,7 @@ function draw() {
   }
 
   s = max([particles.length, 15]);
-  SP = 250 / s;
+  SP = (width/6-50) / s;
 
   if (SHOWXT) {
     showXT();
@@ -165,12 +231,12 @@ function EMPTY(){
 }
 
 function mouseClicked() {
-  let px = round(mouseX / 10) * 10;
-  let py = round(mouseY / 10) * 10;
-  if (px > 600) {
+  let px = round(mouseX / Npos) * Npos;
+  let py = round(mouseY / Npos) * Npos;
+  if (px > width/2) {
     return;
   }
-  if (py > (height-20)) {
+  if (py < 5*Npos) {
     return;
   }
   if (SHOWCIRC){
@@ -183,31 +249,22 @@ function mouseClicked() {
 
 function showXT() {
   push();
+  translate(width/2,height/6);
   strokeWeight(2);
-  line(650, 5, 650, 145);
-  line(625, 75, 900, 75)
-  pop();
+  line(50, -height/6+5, 50, height/6-5);
+  line(25, 0, width/6, 0)
 
-  push();
-  translate(610, 75);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("x (m)", 0, 0);
-  pop();
+  text("x (m)", 35, 30);
   
-  push();
-  translate(780, 150);
-  rotate(0);
-  textAlign(CENTER, CENTER);
-  text("t (s)", 0, 0);
-  pop();
+  rotate(PI / 2);
+  text("t (s)", width/12+25, height/6-5);
 
-  push();
   fill(0);
-  translate(650, 75);
   for (let i = 0; i < particles.length; i++) {
-    let px = (particles[i].x - 300) / 5;
-    let pt = particles[i].t * SP;
+    let px = (height/6-10)*(particles[i].x - width/4) / height;
+    let pt = particles[i].t * SP + 50;
     circle(pt, -px, 10);
   }
   pop();
@@ -215,32 +272,22 @@ function showXT() {
 
 function showYT() {
   push();
+  translate(3*width/4,height/6);
   strokeWeight(2);
-  line(950, 5, 950, 145);
-  line(925, 75, 1200, 75);
-  pop();
+  line(50, -height/6+5, 50, height/6-5);
+  line(25, 0, width/6, 0)
 
-  push();
-  translate(910, 75);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("y (m)", 0, 0);
-  pop();
+  text("y (m)", 35, 30);
   
-  push();
-  translate(1080, 150);
-  rotate(0);
-  textAlign(CENTER, CENTER);
-  text("t (s)", 0, 0);
-  pop();
-  
+  rotate(PI / 2);
+  text("t (s)", width/12+25, height/6-5);
 
-  push();
   fill(0);
-  translate(950, 75);
   for (let i = 0; i < particles.length; i++) {
-    let py = (particles[i].y - height/2) / 5;
-    let pt = particles[i].t * SP;
+    let py = (height/6-10)*(particles[i].y - height/2) / height;
+    let pt = particles[i].t * SP + 50;
     circle(pt, py, 10);
   }
   pop();
@@ -248,32 +295,23 @@ function showYT() {
 
 function showVXT() {
   push();
+  translate(width/2,height/3+height/6);
   strokeWeight(2);
-  line(650, 155, 650, 295);
-  line(625, 225, 900, 225);
-  pop();
+  line(50, -height/6+5, 50, height/6-5);
+  line(25, 0, width/6, 0)
 
-  push();
-  translate(610, 225);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("vₓ (m/s)", 0, 0);
-  pop();
-
-  push();
-  translate(780, 300);
-  rotate(0);
-  textAlign(CENTER, CENTER);
-  text("t (s)", 0, 0);
-  pop();
+  text("vₓ (m/s)", 45, 30);
   
-  push();
+  rotate(PI / 2);
+  text("t (s)", width/12+25, height/6-5);
+
   fill(0);
-  translate(650, 225);
   for (let i = 0; i < vels.length; i++) {
     let px = vels[i].v.x / 2;
     let py = vels[i].v.y / 2;
-    let pt = vels[i].t * SP;
+    let pt = vels[i].t * SP+50;
     circle(pt, -px, 10);
   }
   pop();
@@ -281,32 +319,23 @@ function showVXT() {
 
 function showVYT() {
   push();
+  translate(3*width/4,height/3+height/6);
   strokeWeight(2);
-  line(950, 155, 950, 295);
-  line(925, 225, 1200, 225);
-  pop();
+  line(50, -height/6+5, 50, height/6-5);
+  line(25, 0, width/6, 0)
 
-  push();
-  translate(910, 225);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("vᵧ (m/s)", 0, 0);
-  pop();
+  text("vᵧ (m/s)", 45, 30);
   
-  push();
-  translate(1080, 300);
-  rotate(0);
-  textAlign(CENTER, CENTER);
-  text("t (s)", 0, 0);
-  pop();
+  rotate(PI / 2);
+  text("t (s)", width/12+25, height/6-5);
 
-  push();
   fill(0);
-  translate(950, 225);
   for (let i = 0; i < vels.length; i++) {
     let px = vels[i].v.x / 2;
     let py = vels[i].v.y / 2;
-    let pt = vels[i].t * SP;
+    let pt = vels[i].t * SP + 50;
     circle(pt, py, 10);
   }
   pop();
@@ -314,32 +343,22 @@ function showVYT() {
 
 function showAXT() {
   push();
+  translate(width/2,5*height/6);
   strokeWeight(2);
-  line(650, 305, 650, 445);
-  line(625, 375, 900, 375);
-  pop();
+  line(50, -height/6+5, 50, height/6-5);
+  line(25, 0, width/6, 0)
 
-  push();
-  translate(610, 375);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("aₓ (m/s²)", 0, 0);
-  pop();
+  text("aₓ (m/s²)", 50, 30);
   
-  push();
-  translate(780, 450);
-  rotate(0);
-  textAlign(CENTER, CENTER);
-  text("t (s)", 0, 0);
-  pop();
+  rotate(PI / 2);
+  text("t (s)", width/12+25, height/6-5);
 
-  push();
   fill(0);
-  translate(650, 375);
   for (let i = 0; i < accs.length; i++) {
-    let px = accs[i].v.x / 2;
-    let py = accs[i].v.y / 2;
-    let pt = accs[i].t * SP;
+    let px = accs[i].v.x*3;
+    let pt = accs[i].t * SP+50;
     circle(pt, -px, 10);
   }
   pop();
@@ -347,32 +366,22 @@ function showAXT() {
 
 function showAYT() {
   push();
+  translate(3*width/4,5*height/6);
   strokeWeight(2);
-  line(950, 305, 950, 445);
-  line(925, 375, 1200, 375);
-  pop();
+  line(50, -height/6+5, 50, height/6-5);
+  line(25, 0, width/6, 0)
 
-  push();
-  translate(910, 375);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("aᵧ (m/s²)", 0, 0);
-  pop();
+  text("aᵧ (m/s²)", 50, 30);
   
-  push();
-  translate(1080, 450);
-  rotate(0);
-  textAlign(CENTER, CENTER);
-  text("t (s)", 0, 0);
-  pop();
+  rotate(PI / 2);
+  text("t (s)", width/12+25, height/6-5);
 
-  push();
   fill(0);
-  translate(950, 375);
   for (let i = 0; i < accs.length; i++) {
-    let px = accs[i].v.x;
-    let py = accs[i].v.y;
-    let pt = accs[i].t * SP;
+    let py = accs[i].v.y*3;
+    let pt = accs[i].t * SP+50;
     circle(pt, py, 10);
   }
   pop();
